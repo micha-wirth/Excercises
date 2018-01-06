@@ -61,31 +61,32 @@ def insertion_sort(my_list=list()):
     # for index, item in enumerate(my_list[1:]):
     #     for x in range(index + 1, -1, -1):
     #         if item < my_list[x -1]:
-    #             my_list[x] = my_list[x -1 ]
+    #             my_list[x] = my_list[x - 1]
     #         else:
     #             break
     #     my_list[x] = item
 
     # Option #3:
-    for index1, item1 in enumerate(my_list[:-1]):
-        for index2, item2 in enumerate(my_list[1:index1]):
-            if item1 < item2:
-                my_list[index2 + 1] = item2
+    for index1, item1 in enumerate(my_list[1:]):
+        index = index1
+        item2 = item1
+        for index2, item2 in enumerate(reversed(my_list[:index1+1])):
+            if item1 > item2:
+                index -= 1
             else:
                 break
-        my_list[index2] = item1
+        my_list.insert(index, item1)
+        #del my_list[index2]
     return my_list
 
 
 
 
 if __name__ == "__main__":
-    import doctest
+    #import doctest
 
-    doctest.testmod()
+    #doctest.testmod()
 
-
-if __name__ == "__main__":
-    import doctest
-
-    doctest.testmod()
+    my_list = [2, 0, 1]
+    insertion_sort(my_list)
+    print(my_list)

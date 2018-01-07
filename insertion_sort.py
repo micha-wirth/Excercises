@@ -40,7 +40,7 @@ def insertion_sort(my_list=list()):
     if not isinstance(my_list, (list)):
         raise TypeError('my_list must be a list.')
 
-    # Option #1
+    # # Option #1:
     # for i in range(len(my_list)-1):
     #     for j in range(i+1, 0, -1):
     #         if (isinstance(my_list[j-1], (int, float))
@@ -50,43 +50,57 @@ def insertion_sort(my_list=list()):
     #         else:
     #             raise TypeError('wrong type of element in list.')
 
-    # Option #2.
+    # # Option #2:
     # for index, item in enumerate(my_list):
     #     while index > 0 and item < my_list[index - 1]:
     #         my_list[index] = my_list[index - 1]
     #         index -= 1
     #     my_list[index] = item
 
-    # Option #3.
-    # for index, item in enumerate(my_list[1:]):
-    #     for x in range(index + 1, -1, -1):
-    #         if item < my_list[x -1]:
-    #             my_list[x] = my_list[x - 1]
+    # # Option #3:
+    # for previous_index, current_item in enumerate(my_list[1:]):
+    #     insert_pos = previous_index + 1
+    #     for index in range(previous_index, -1, -1):
+    #         if current_item < my_list[index]:
+    #             my_list[index + 1] = my_list[index]
+    #             insert_pos = index
     #         else:
     #             break
-    #     my_list[x] = item
+    #     my_list[insert_pos] = current_item
 
-    # Option #3:
-    for index1, item1 in enumerate(my_list[1:]):
-        index = index1
-        item2 = item1
-        for index2, item2 in enumerate(reversed(my_list[:index1+1])):
-            if item1 > item2:
-                index -= 1
+    # # Option #4:
+    # if len(my_list) > 1:
+    #     for current_index in range(1, len(my_list), 1):
+    #         insert_pos = current_index
+    #         for previous_index in range(current_index - 1, -1, -1):
+    #             if my_list[previous_index] > my_list[current_index]:
+    #                 insert_pos = previous_index
+    #             else:
+    #                 break
+    #         if insert_pos != current_index:
+    #             my_list.insert(insert_pos, my_list.pop(current_index))
+
+    # Option #5:
+    for j, current_item in enumerate(my_list[1:]):
+        current_index = j + 1
+        insert_pos = current_index
+        for i, previous_item in enumerate(reversed(my_list[:current_index])):
+            previous_index = j - i
+            if current_item < previous_item:
+                insert_pos = previous_index
             else:
                 break
-        my_list.insert(index, item1)
-        #del my_list[index2]
+        if insert_pos != current_index:
+            my_list.insert(insert_pos, my_list.pop(current_index))
+
     return my_list
 
 
-
-
 if __name__ == "__main__":
-    #import doctest
+    import doctest
 
-    #doctest.testmod()
+    doctest.testmod()
 
-    my_list = [2, 0, 1]
+    my_list = [2, 0, 1, -1]
     insertion_sort(my_list)
     print(my_list)

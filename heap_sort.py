@@ -164,8 +164,6 @@ def repair_heap(array, parent_index, last_child_index):
     return array
 
 
-
-
 if __name__ == "__main__":
     import doctest
 

@@ -1,5 +1,8 @@
 #! /usr/bin/env python3
 
+import time
+import matplotlib.pyplot as plt
+
 
 def heap_sort(array):
     """ Implementation of the heap sort algorithm.
@@ -160,11 +163,37 @@ def repair_heap(array, parent_index, last_child_index):
         elif left <= last_child_index:
             if array[left] > array[parent]:
                 array[left], array[parent] = array[parent], array[left]
+        else:
+            break
 
     return array
+
+
+def measure_performance():
+    """ Measure the performance of the heap sort algorithm.
+    """
+
+    for count in range(0, 50001, 1000):
+        array = [x for x in range(count, 0, -1)]
+        msecs = measure_time(array)
+        plt.plot([count], [msecs], 'o')
+    plt.xlabel("count of elements")
+    plt.ylabel("time in msecs")
+    plt.show()
+
+def measure_time(array):
+    """ Measure time consumption in msecs for the sorting algorithm.
+    """
+
+    start = time.time()
+    heap_sort(array)
+    end = time.time()
+    return (end - start) * 1000
 
 
 if __name__ == "__main__":
     import doctest
 
     doctest.testmod()
+
+    measure_performance()

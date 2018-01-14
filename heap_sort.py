@@ -169,26 +169,28 @@ def repair_heap(array, parent_index, last_child_index):
     return array
 
 
-def measure_performance():
-    """ Measure the performance of the heap sort algorithm.
+def runtime_plot():
+    """ Generate runtime plot T(n) with different input sizes of n.
     """
 
-    for count in range(0, 50001, 1000):
-        array = [x for x in range(count, 0, -1)]
-        msecs = measure_time(array)
-        plt.plot([count], [msecs], 'o')
-    plt.xlabel("count of elements")
-    plt.ylabel("time in msecs")
+    print("Start runtime plot")
+    for count_n in range(1000, 101000, 1000):
+        array = [x for x in range(count_n, 0, -1)]
+        time_milli = measure_time(array)
+        plt.plot(count_n, time_milli, 'o')
+    plt.xlabel("count n of elements")
+    plt.ylabel("runtime T(n) in milliseconds")
     plt.show()
+    print("Finish runtime plot")
 
 
 def measure_time(array):
-    """ Measure time consumption in msecs for the sorting algorithm.
+    """ Measure time consumption of sorting algorithm for given array in milliseconds.
     """
 
-    start = time.time()
+    start = time.perf_counter()
     heap_sort(array)
-    end = time.time()
+    end = time.perf_counter()
     return (end - start) * 1000
 
 
@@ -197,4 +199,10 @@ if __name__ == "__main__":
 
     doctest.testmod()
 
-    measure_performance()
+    runtime_plot()
+
+    array = [5, 4, 3, 2, 1, 0, -1, -2, -3, -4]
+    print("Array before sorting:", array)
+    time_micro = measure_time(array) * 1000
+    print("Runtime T(n) = {0:e} microseconds".format(time_micro))
+    print("Array after sorting:", array)

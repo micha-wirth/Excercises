@@ -181,6 +181,7 @@ def measure_performance():
     plt.ylabel("time in msecs")
     plt.show()
 
+
 def measure_time(array):
     """ Measure time consumption in msecs for the sorting algorithm.
     """

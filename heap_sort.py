@@ -4,7 +4,7 @@ import time
 import matplotlib.pyplot as plt
 
 
-def heap_sort(array):
+def heap_sort(arr):
     """ Implementation of the heap sort algorithm.
 
     :param arr:
@@ -38,23 +38,23 @@ def heap_sort(array):
     #     repair_heap(array, root_parent_index, child_index - 1)
 
     # Option #2:
-    first_index = 0
-    first_child_index = 1
-    last_child_index = len(array) - 1
+    first_idx = 0
+    first_child_idx = 1
+    last_child_idx = len(arr) - 1
 
-    heapify(array)
+    heapify(arr)
 
-    for last_index in reversed(range(first_child_index, last_child_index + 1)):
-        array[first_index], array[last_index] = array[last_index], array[first_index]
-        repair_heap(array, first_index, last_index - 1)
+    for last_idx in reversed(range(first_child_idx, last_child_idx + 1)):
+        arr[first_idx], arr[last_idx] = arr[last_idx], arr[first_idx]
+        repair_heap(arr, first_idx, last_idx - 1)
 
-    return array
+    return arr
 
 
-def heapify(array):
+def heapify(arr):
     """
 
-    :param array:
+    :param arr:
     :return:
 
     # List with an even number of elements to function call.
@@ -82,32 +82,32 @@ def heapify(array):
     #     repair_heap(array, parent_index, last_child_index)
 
     # Option #2:
-    if array:
-        last_child = len(array) - 1
-        last_parent = (last_child - 1) >> 1 # parent = (child - 1) // 2
+    if arr:
+        last_child = len(arr) - 1
+        last_parent = (last_child - 1) >> 1  # parent = (child - 1) // 2
         if (last_child % 2) == 0:
             right = last_child
             left = right - 1
-            if array[right] > array[left] and array[right] > array[last_parent]:
-                array[right], array[last_parent] = array[last_parent], array[right]
-            elif array[left] > array[right] and array[left] > array[last_parent]:
-                array[left], array[last_parent] = array[last_parent], array[left]
+            if arr[right] > arr[left] and arr[right] > arr[last_parent]:
+                arr[right], arr[last_parent] = arr[last_parent], arr[right]
+            elif arr[left] > arr[right] and arr[left] > arr[last_parent]:
+                arr[left], arr[last_parent] = arr[last_parent], arr[left]
         else:
             left = last_child
-            if array[left] > array[last_parent]:
-                array[left], array[last_parent] = array[last_parent], array[left]
+            if arr[left] > arr[last_parent]:
+                arr[left], arr[last_parent] = arr[last_parent], arr[left]
 
         for parent in range(last_parent - 1, -1, -1):
-            left = (parent << 1) + 1 # left = (2 * parent) + 1
+            left = (parent << 1) + 1  # left = (2 * parent) + 1
             right = left + 1
-            if array[left] > array[right] and array[left] > array[parent]:
-                array[left], array[parent] = array[parent], array[left]
-                repair_heap(array, left, last_child)
-            elif array[right] > array[left] and array[right] > array[parent]:
-                array[right], array[parent] = array[parent], array[right]
-                repair_heap(array, right, last_child)
+            if arr[left] > arr[right] and arr[left] > arr[parent]:
+                arr[left], arr[parent] = arr[parent], arr[left]
+                repair_heap(arr, left, last_child)
+            elif arr[right] > arr[left] and arr[right] > arr[parent]:
+                arr[right], arr[parent] = arr[parent], arr[right]
+                repair_heap(arr, right, last_child)
 
-    return array
+    return arr
 
 
 def repair_heap(array, parent_index, last_child_index):

@@ -1,7 +1,8 @@
 #! /usr/bin/env python3
 
+
 def insertion_sort(my_list=list()):
-    ''' Implementation of insertion sort algorithm.
+    """ Implementation of insertion sort algorithm.
 
     # Empty list.
     >>> insertion_sort([])
@@ -34,10 +35,10 @@ def insertion_sort(my_list=list()):
     # Traceback (most recent call last):
     #     ...
     # TypeError: wrong type of element in list.
-    '''
+    """
 
     # Check given parameter data type.
-    if not isinstance(my_list, (list)):
+    if not isinstance(my_list, list):
         raise TypeError('my_list must be a list.')
 
     # # Option #1:

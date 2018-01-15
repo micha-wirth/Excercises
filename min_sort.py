@@ -1,7 +1,7 @@
 #! /usr/bin/env python3
 
 
-def min_sort(my_list):
+def min_sort(lst):
     """ Implementation of min sort algorithm.
 
     >>> min_sort([24, 6, 12, 32, 0, 18, -1])
@@ -17,20 +17,19 @@ def min_sort(my_list):
         ...
     TypeError: my_list must be a list.
 
-    # Wrong type(s) of elements in given list.
-    >>> min_sort([0, -1, '1', 2, 3])
-    Traceback (most recent call last):
-        ...
-    TypeError: wrong type of element in given list.
+    # # Wrong type(s) of elements in given list.
+    # >>> min_sort([0, -1, '1', 2, 3])
+    # Traceback (most recent call last):
+    #     ...
+    # TypeError: wrong type of element in given list.
 
     # Elements of type int and float in given list.
     >>> min_sort([0.0, 0, -1.5, 1, -2])
     [-2, -1.5, 0, 0.0, 1]
-
     """
 
     # Check type of given parameter to function call.
-    if not isinstance(my_list, list):
+    if not isinstance(lst, list):
         raise TypeError('my_list must be a list.')
 
     # # Option #1.
@@ -46,16 +45,18 @@ def min_sort(my_list):
     #     if i != min_index:
     #         my_list[i], my_list[min_index] = my_list[min_index], my_list[i]
 
-    # # Option #2:
-    # for i, x in enumerate(my_list[:-1]):
-    #     min_index = i
-    #     for j, y in enumerate(my_list[i + 1:]):
-    #         if x > y:
-    #             min_index = i + j + 1
-    #     if min_index != i:
-    #         my_list[i], my_list[min_index] = my_list[min_index], x
+    # Option #2:
+    for i, x in enumerate(lst[:-1]):
+        min_index = i
+        min_value = lst[min_index]  # min_value = x
+        for j, y in enumerate(lst[i + 1:], i + 1):
+            if min_value > y:
+                min_index = j
+                min_value = y
+        if min_index != i:
+            lst[i], lst[min_index] = lst[min_index], lst[i]
 
-    return my_list
+    return lst
 
 
 if __name__ == "__main__":

@@ -110,10 +110,10 @@ def heapify(arr):
     return arr
 
 
-def repair_heap(array, parent_index, last_child_index):
+def repair_heap(arr, parent_index, last_child_index):
     """ Repair the heap.
 
-    :param array:
+    :param arr:
     :param parent_index:
     :param last_child_index:
     :return:
@@ -154,19 +154,19 @@ def repair_heap(array, parent_index, last_child_index):
         left = (parent << 1) + 1
         right = left + 1
         if right <= last_child_index:
-            if array[left] > array[right] and array[left] > array[parent]:
-                array[left], array[parent] = array[parent], array[left]
+            if arr[left] > arr[right] and arr[left] > arr[parent]:
+                arr[left], arr[parent] = arr[parent], arr[left]
                 parent = left
-            elif array[right] > array[left] and array[right] > array[parent]:
-                array[right], array[parent] = array[parent], array[right]
+            elif arr[right] > arr[left] and arr[right] > arr[parent]:
+                arr[right], arr[parent] = arr[parent], arr[right]
                 parent = right
         elif left <= last_child_index:
-            if array[left] > array[parent]:
-                array[left], array[parent] = array[parent], array[left]
+            if arr[left] > arr[parent]:
+                arr[left], arr[parent] = arr[parent], arr[left]
         else:
             break
 
-    return array
+    return arr
 
 
 def runtime_plot():
@@ -175,8 +175,8 @@ def runtime_plot():
 
     print("Start runtime plot")
     for count_n in range(1000, 101000, 1000):
-        array = [x for x in range(count_n, 0, -1)]
-        time_milli = measure_time(array)
+        arr = [x for x in range(count_n, 0, -1)]
+        time_milli = measure_time(arr)
         plt.plot(count_n, time_milli, 'o')
     plt.xlabel("count n of elements")
     plt.ylabel("runtime T(n) in milliseconds")
@@ -184,12 +184,12 @@ def runtime_plot():
     print("Finish runtime plot")
 
 
-def measure_time(array):
+def measure_time(arr):
     """ Measure time consumption of sorting algorithm for given array in milliseconds.
     """
 
     start = time.perf_counter()
-    heap_sort(array)
+    heap_sort(arr)
     end = time.perf_counter()
     return (end - start) * 1000
 

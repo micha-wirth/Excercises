@@ -1,7 +1,7 @@
 #! /usr/bin/env python3
 
 
-def insertion_sort(my_list=list()):
+def insertion_sort(lst=list()):
     """ Implementation of insertion sort algorithm.
 
     # Empty list.
@@ -38,7 +38,7 @@ def insertion_sort(my_list=list()):
     """
 
     # Check given parameter data type.
-    if not isinstance(my_list, list):
+    if not isinstance(lst, list):
         raise TypeError('my_list must be a list.')
 
     # # Option #1:
@@ -82,19 +82,19 @@ def insertion_sort(my_list=list()):
     #             my_list.insert(insert_pos, my_list.pop(current_index))
 
     # Option #5:
-    for j, current_item in enumerate(my_list[1:]):
+    for j, current_item in enumerate(lst[1:]):
         current_index = j + 1
         insert_pos = current_index
-        for i, previous_item in enumerate(reversed(my_list[:current_index])):
+        for i, previous_item in enumerate(reversed(lst[:current_index])):
             previous_index = j - i
             if current_item < previous_item:
                 insert_pos = previous_index
             else:
                 break
         if insert_pos != current_index:
-            my_list.insert(insert_pos, my_list.pop(current_index))
+            lst.insert(insert_pos, lst.pop(current_index))
 
-    return my_list
+    return lst
 
 
 if __name__ == "__main__":

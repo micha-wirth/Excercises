@@ -1,7 +1,7 @@
 #! /usr/bin/env python3
 
 
-def bubble_sort(my_list: object = list()):
+def bubble_sort(my_list=list()):
     """ Implementation of bubble sort algorithm.
 
     # No parameter (no list) to function call.
@@ -53,10 +53,10 @@ def bubble_sort(my_list: object = list()):
     #             my_list[index], my_list[index + 1] = my_list[index + 1], my_list[index]
 
     # Option #5.
-    for x, y in enumerate(my_list[1:]):
-        for index, item in enumerate(my_list[:-1]):
-            if item > my_list[index + 1]:
-                my_list[index], my_list[index + 1] = my_list[index + 1], my_list[index]
+    for j, y in enumerate(my_list[1:], 1):
+        for i, x in enumerate(my_list[:-1]):
+            if x > y:
+                my_list[i], my_list[j] = my_list[j], my_list[i]
     return  my_list
 
 

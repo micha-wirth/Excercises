@@ -1,7 +1,7 @@
 #! /usr/bin/env python3
 
 
-def bubble_sort(my_list=list()):
+def bubble_sort(lst=list()):
     """ Implementation of bubble sort algorithm.
 
     # No parameter (no list) to function call.
@@ -25,39 +25,39 @@ def bubble_sort(my_list=list()):
     [0, 1, 2]
     """
 
-    # Option #1.
-    # if len(my_list) > 0:
-    #     for i in range(len(my_list) - 1):
-    #         for j in range(len(my_list) - 1):
-    #             if my_list[j] > my_list[j + 1]:
-    #                 my_list[j], my_list[j + 1] = my_list[j + 1], my_list[j]
-
-    # Option #2.
-    # if len(my_list) > 0:
-    #     for x in range(len(my_list) - 1):
-    #         for index, item in enumerate(my_list[:-1]):
-    #             if item > my_list[index + 1]:
-    #                 my_list[index], my_list[index + 1] = my_list[index + 1], my_list[index]
-
-    # Option #3.
-    # if len(my_list) > 0:
-    #     for x in my_list[:-1]:
-    #         for index, item in enumerate(my_list[:-1]):
-    #             if item > my_list[index + 1]:
-    #                 my_list[index], my_list[index + 1] = my_list[index + 1], my_list[index]
-
-    # Option #4.
-    # for x in my_list[1:]:
-    #     for index, item in enumerate(my_list[:-1]):
-    #         if item > my_list[index + 1]:
-    #             my_list[index], my_list[index + 1] = my_list[index + 1], my_list[index]
+    # # Option #1.
+    # if len(lst) > 0:
+    #     for i in range(len(lst) - 1):
+    #         for j in range(len(lst) - 1):
+    #             if lst[j] > lst[j + 1]:
+    #                 lst[j], lst[j + 1] = lst[j + 1], lst[j]
+    #
+    # # Option #2.
+    # if len(lst) > 0:
+    #     for x in range(len(lst) - 1):
+    #         for index, item in enumerate(lst[:-1]):
+    #             if item > lst[index + 1]:
+    #                 lst[index], lst[index + 1] = lst[index + 1], lst[index]
+    #
+    # # Option #3.
+    # if len(lst) > 0:
+    #     for x in lst[:-1]:
+    #         for index, item in enumerate(lst[:-1]):
+    #             if item > lst[index + 1]:
+    #                 lst[index], lst[index + 1] = lst[index + 1], lst[index]
+    #
+    # # Option #4.
+    # for x in lst[1:]:
+    #     for index, item in enumerate(lst[:-1]):
+    #         if item > lst[index + 1]:
+    #             lst[index], lst[index + 1] = lst[index + 1], lst[index]
 
     # Option #5.
-    for j, y in enumerate(my_list[1:], 1):
-        for i, x in enumerate(my_list[:-1]):
+    for j, y in enumerate(lst[1:], 1):
+        for i, x in enumerate(lst[:-1]):
             if x > y:
-                my_list[i], my_list[j] = my_list[j], my_list[i]
-    return  my_list
+                lst[i], lst[j] = lst[j], lst[i]
+    return lst
 
 
 if __name__ == "__main__":

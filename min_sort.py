@@ -1,6 +1,9 @@
 #! /usr/bin/env python3
 
 
+from itertools import islice
+
+
 def min_sort(lst):
     """ Implementation of min sort algorithm.
 
@@ -45,16 +48,28 @@ def min_sort(lst):
     #     if i != min_index:
     #         my_list[i], my_list[min_index] = my_list[min_index], my_list[i]
 
-    # Option #2:
-    for i, x in enumerate(lst[:-1]):
-        min_index = i
-        min_value = lst[min_index]  # min_value = x
-        for j, y in enumerate(lst[i + 1:], i + 1):
-            if min_value > y:
-                min_index = j
-                min_value = y
-        if min_index != i:
-            lst[i], lst[min_index] = lst[min_index], lst[i]
+    # # Option #2:
+    # for i, x in enumerate(lst[:-1]):
+    #     min_index = i
+    #     min_value = lst[i]  # x != lst[i]
+    #     for j, y in enumerate(lst[i + 1:], i + 1):
+    #         if min_value > y:
+    #             min_index = j
+    #             min_value = y
+    #     if min_index != i:
+    #         lst[i], lst[min_index] = lst[min_index], lst[i]  # x != lst[i]
+
+    # Option #3:
+    if lst:
+        for i, x in enumerate(islice(lst, len(lst)-1)):
+            min_index = i
+            min_value = x
+            for j, y in enumerate(islice(lst, i+1, None), i+1):
+                if y < min_value:
+                    min_index = j
+                    min_value = y
+            if min_index != i:
+                lst[i], lst[min_index] = min_value, x
 
     return lst
 

@@ -1,5 +1,9 @@
 #! /usr/bin/env python3
 
+"""
+Exercise #13: Implementation of Dijkstra's algorithm.
+"""
+
 import re
 import queue
 import sys
@@ -11,16 +15,14 @@ class Graph:
     def __init__(self):
         self._num_nodes = 0
         self._num_arcs = 0
-
         # Node objects are stored in a list.
         self._nodes = []
-
         # Edge objects are stored for each node in a list.
         self._adjacency_lists = []
 
     def read_graph_from_file(self, file_name):
         """
-        Read in graph from .graph file.
+        Read in graph from *.graph file.
 
         Specification of *.graph file format:
             1st line: number of nodes
@@ -28,23 +30,22 @@ class Graph:
             3rd column lines with node information:
                 node_id latitude longitude
             4th column lines with edge information:
-                tail_node_id head_node_id distance(m) max_speed(km/h)
+                tail_node_id head_node_id distance [m] max_speed [km/h]
         Comment lines (^#) are ignored.
 
         :param file_name:
-        :return:
+        :return: None
 
         # Test
         >>> graph = Graph()
         >>> graph.read_graph_from_file('graph_13/test.graph')
         >>> graph
-        [0->1(30), 0->(70), 1->2(20), 2->3(50), 3->1(40), 4->3(20)]
-
+        [0->1(30), 0->2(70), 1->2(20), 2->3(50), 3->1(40), 4->3(20)]
         """
 
         column_lines = 0
-        with open(file_name, 'rt') as f:
-            for line in f:
+        with open(file_name, 'rt') as graph_file:
+            for line in graph_file:
                 columns = line.strip().split(' ')
                 # Skip comment lines.
                 if re.search('^#', columns[0]):
@@ -53,8 +54,10 @@ class Graph:
                 if column_lines == 1:
                     if self._num_nodes != 0:
                         raise Exception('Graph is already read in')
+                    # Number of nodes.
                     self._num_nodes = int(columns[0])
                 elif column_lines == 2:
+                    # Number of arcs.
                     self._num_arcs = int(columns[0])
                 elif column_lines <= self._num_nodes + 2:
                     # All node info lines.
@@ -63,11 +66,13 @@ class Graph:
                     node = Node(int(columns[0]), float(columns[1]),
                                 float(columns[2]))
                     # Append node to list.
+                    self._nodes.append(node)
+                    # Append empty adjacency list for node.
                     self._adjacency_lists.append([])
                 else:
                     # All arc info lines.
                     if not len(columns) == 4:
-                        raise Exception('Arc info line with != columns')
+                        raise Exception('Arc info line with != 4 columns')
                     tail_node_id = int(columns[0])
                     arc = Arc(tail_node_id, int(columns[1]), int(columns[2]),
                               int(columns[3]))
@@ -104,11 +109,11 @@ class Graph:
         1
         """
 
-        # List of currently visited nodes.
+        # List of nodes to visit currently.
         current_level = [node_id]
         # Create a list of marked nodes. Reachable nodes are marked with 1.
         marked_nodes = [0] * self._num_nodes
-        # Mark start node as reachable.
+        # Mark start node as reachable node.
         marked_nodes[node_id] = 1
         # Store number of reachable nodes.
         num_marked_nodes = 1
@@ -137,8 +142,38 @@ class Graph:
         :param max_vehicle_speed: [km/h]
         :return: None
 
+        # Doctest(s):
         >>> graph = Graph()
         >>> graph.read_graph_from_file('graph_13/test.graph')
+        >>> graph
+        [0->1(30), 0->2(70), 1->2(20), 2->3(50), 3->1(40), 4->3(20)]
+        >>> graph.set_arc_costs_to_travel_time(100)
+        >>> graph
+        [0->1(4), 0->2(8), 1->2(2), 2->3(6), 3->1(5), 4->3(2)]
+        """
+
+        for i in range(self._num_nodes):
+            for arc in self._adjacency_lists[i]:
+                # Compute max. possible speed for this arc.
+                max_speed = min(arc.max_speed, int(max_vehicle_speed))
+                # Compute travel time in whole seconds.
+                travel_time_sec = '{0:.0f}'.format(arc.distance / (max_speed / 3.6))
+                # Set costs to travel time in whole seconds.
+                arc.costs = int(travel_time_sec)
+
+    def set_arc_costs_to_distance(self):
+        """
+        Set arc costs to distance.
+
+        :return: None
+
+        # Doctest(s):
+        >>> graph = Graph()
+        >>> graph.read_graph_from_file(('graph_13/test.graph'))
+        >>> graph
+        [0->1(30), 0->2(70), 1->2(20), 2->3(50), 3->1(40), 4->3(20)]
+        >>> graph.set_arc_costs_to_travel_time(100)
+        >>> graph.set_arc_costs_to_distance()
         >>> graph
         [0->1(30), 0->2(70), 1->2(20), 2->3(50), 3->1(40), 4->3(20)]
         """
@@ -148,14 +183,15 @@ class Graph:
                 arc.costs = arc.distance
 
     def compute_lcc(self, marked_nodes):
-        """
+        """ TODO
         Mark all nodes in the largest connected component.
+
         :param marked_nodes:
         :return:
         """
 
     def compute_shortest_paths(self, start_node_id):
-        """
+        """ TODO
         Compute the shortest paths for a given start node.
         To solve this problem the Dijkstra's algorithm is used.
         :param start_node_id:
@@ -174,17 +210,18 @@ class Graph:
         [0->1(30), 0->2(70), 1->2(20), 2->3(50), 3->1(40), 4->3(20)]
         """
 
-        obj_str_repr = ""
+        obj_str_repr = ''
         for i in range(self._num_nodes):
             for arc in self._adjacency_lists[i]:
-                obj_str_repr += repr(arc) + ", "
+                obj_str_repr += repr(arc) + ', '
             if obj_str_repr:
-                return "[" + obj_str_repr[:-2] + "]"
+                return '[' + obj_str_repr[:-2] + ']'
             else:
-                return "[]"
+                return '[]'
 
 
 class Node:
+
     def __init__(self, node_id, latitude, longitude):
         self._id = node_id
         self._latitude = latitude
@@ -195,16 +232,17 @@ class Node:
 
 
 class Arc:
+
     def __init__(self, tail_id, head_id, distance, max_speed):
         self.tail_node_id = tail_id
-        self.head__node_id = head_id
+        self.head_node_id = head_id
         self.distance = distance
         self.max_speed = max_speed
         self.costs = distance
 
     def __repr__(self):
-        return "{0}->{1}({2}".format(self.tail_node_id, self.head__node_id,
-                                     self.costs)
+        return "{0}->{1}({2})".format(self.tail_node_id, self.head_node_id,
+                                      self.costs)
 
 
 def main():

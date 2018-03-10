@@ -24,6 +24,7 @@ class Graph:
             + [" (%s) " % tup for tup in self.edges]) \
             + '}'
 
+
 def main():
     """
     Main function.

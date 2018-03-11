@@ -20,17 +20,17 @@ class Graph:
         # Edge objects are stored for each node in a list.
         self._adjacency_lists = []
 
-    def read_graph_from_file(self, file_name):
+    def read_graph_from_file(self, file_name, directed=True):
         """
         Read in graph from *.graph file.
 
         Specification of *.graph file format:
             1st line: number of nodes
             2nd line: number of arcs
-            3rd column lines with node information:
+            3-column lines with node information:
                 node_id latitude longitude
-            4th column lines with edge information:
-                tail_node_id head_node_id distance [m] max_speed [km/h]
+            4-column lines with edge information:
+                tail_node_id head_node_id distance[m] max_speed[km/h]
         Comment lines (^#) are ignored.
 
         :param file_name:
@@ -76,8 +76,20 @@ class Graph:
                     tail_node_id = int(columns[0])
                     arc = Arc(tail_node_id, int(columns[1]), int(columns[2]),
                               int(columns[3]))
+
+                    # Create undirected graph.
+                    if not directed:
+                        self._adjacency_lists[arc.head_node_id].append(Arc(arc.head_node_id,
+                                                                            arc.tail_node_id,
+                                                                            arc.distance,
+                                                                            arc.max_speed))
                     # Append arc to tail node's adjacency list.
                     self._adjacency_lists[tail_node_id].append(arc)
+        # graph_file.close()
+        if not graph_file.closed:
+            raise Exception('File *.graph was not closed')
+
+        return None
 
     def get_num_nodes(self):
         """
@@ -101,11 +113,11 @@ class Graph:
 
         >>> graph = Graph()
         >>> graph.read_graph_from_file('graph_13/test2.graph')
-        >>> graph.compute_reachable_nodes(0)
+        >>> graph.compute_reachable_nodes(0)[0]
         4
-        >>> graph.compute_reachable_nodes(4)
+        >>> graph.compute_reachable_nodes(4)[0]
         6
-        >>> graph.compute_reachable_nodes(6)
+        >>> graph.compute_reachable_nodes(6)[0]
         1
         """
 
@@ -132,7 +144,9 @@ class Graph:
                         # Add head_id to the new current level nodes.
                         next_level.append(arc.head_node_id)
             current_level = next_level
-        return num_marked_nodes
+        # return num_marked_nodes
+        # TODO
+        return (num_marked_nodes, marked_nodes)
 
     def set_arc_costs_to_travel_time(self, max_vehicle_speed):
         """
@@ -161,6 +175,8 @@ class Graph:
                 # Set costs to travel time in whole seconds.
                 arc.costs = int(travel_time_sec)
 
+        return None
+
     def set_arc_costs_to_distance(self):
         """
         Set arc costs to distance.
@@ -182,13 +198,52 @@ class Graph:
             for arc in self._adjacency_lists[i]:
                 arc.costs = arc.distance
 
-    def compute_lcc(self, marked_nodes):
+        return None
+
+    def compute_lcc(self):
         """ TODO
         Mark all nodes in the largest connected component.
 
         :param marked_nodes:
         :return:
+
+        # Doctest(s):
+        >>> graph = Graph()
+        >>> graph.read_graph_from_file('graph_13/test.graph')
+        >>> graph
+        [0->1(30), 0->2(70), 1->2(20), 2->3(50), 3->1(40), 4->3(20)]
+        >>> graph.compute_lcc()
+        (4, [4, 1, 2, 3])
+        >>> graph2 = Graph()
+        >>> graph2.read_graph_from_file('graph_13/test2.graph')
+        >>> graph2.compute_lcc()
+        (6, [5, 1, 2, 3, 4])
         """
+        # Shallow copy of all nodes.
+        unvisited_nodes = self._nodes[:]
+        lcc = (0, None)
+
+        # Visit all nodes which are in no connected component.
+        while len(unvisited_nodes) > 0:
+            # Remove one node in each iteration.
+            node = unvisited_nodes.pop()
+
+            (num_marked_nodes, marked_nodes) = self.compute_reachable_nodes(node_id=node._id)
+
+            # Create a list with all visited nodes in this lcc.
+            marked_indices = [node._id]
+            for marked_node, marked in enumerate(marked_nodes):
+                if marked == 1 and self._nodes[marked_node] in unvisited_nodes:
+                    marked_indices.append(marked_node)
+                    # Remove from unvisited list.
+                    unvisited_nodes.remove(self._nodes[marked_node])
+
+            # Have we already found a larger component?
+            if num_marked_nodes > lcc[0]:
+                lcc = (num_marked_nodes, marked_indices)
+
+        return lcc
+
 
     def compute_shortest_paths(self, start_node_id):
         """ TODO
@@ -197,6 +252,7 @@ class Graph:
         :param start_node_id:
         :return:
         """
+
 
     def __repr__(self):
         """
@@ -211,13 +267,13 @@ class Graph:
         """
 
         obj_str_repr = ''
-        for i in range(self._num_nodes):
-            for arc in self._adjacency_lists[i]:
+        for idx in range(self._num_nodes):
+           for arc in self._adjacency_lists[idx]:
                 obj_str_repr += repr(arc) + ', '
-            if obj_str_repr:
-                return '[' + obj_str_repr[:-2] + ']'
-            else:
-                return '[]'
+        if obj_str_repr:
+            return '[' + obj_str_repr[:-2] + ']'
+        else:
+            return '[]'
 
 
 class Node:
@@ -228,7 +284,7 @@ class Node:
         self._longitude = longitude
 
     def __repr__(self):
-        return "{0}".format(self._id)
+        return '{0}'.format(self._id)
 
 
 class Arc:
@@ -238,18 +294,24 @@ class Arc:
         self.head_node_id = head_id
         self.distance = distance
         self.max_speed = max_speed
+        # Set default costs to distance.
         self.costs = distance
 
     def __repr__(self):
-        return "{0}->{1}({2})".format(self.tail_node_id, self.head_node_id,
+        return '{0}->{1}({2})'.format(self.tail_node_id, self.head_node_id,
                                       self.costs)
 
 
 def main():
-    """ 
+    """ TODO
     Main function.
     """
-    pass
+    # graph = Graph()
+    # graph.read_graph_from_file('graph_13/test.graph')
+    # print(graph)
+    # print(graph.get_num_nodes())
+    # print(graph.get_num_arcs())
+    # print(graph._adjacency_lists)
 
 
 if __name__ == '__main__':

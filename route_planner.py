@@ -205,7 +205,7 @@ class Graph:
         Mark all nodes in the largest connected component.
 
         :param marked_nodes:
-        :return:
+        :return: longest connected component.
 
         # Doctest(s):
         >>> graph = Graph()
@@ -224,14 +224,17 @@ class Graph:
         lcc = (0, None)
 
         # Visit all nodes which are in no connected component.
-        while len(unvisited_nodes) > 0:
+        # while len(unvisited_nodes) > 0:
+        while unvisited_nodes:
             # Remove one node in each iteration.
             node = unvisited_nodes.pop()
+            # node = unvisited_nodes[0]
 
             (num_marked_nodes, marked_nodes) = self.compute_reachable_nodes(node_id=node._id)
 
             # Create a list with all visited nodes in this lcc.
             marked_indices = [node._id]
+            # marked_indices = []
             for marked_node, marked in enumerate(marked_nodes):
                 if marked == 1 and self._nodes[marked_node] in unvisited_nodes:
                     marked_indices.append(marked_node)
@@ -249,10 +252,50 @@ class Graph:
         """ TODO
         Compute the shortest paths for a given start node.
         To solve this problem the Dijkstra's algorithm is used.
-        :param start_node_id:
-        :return:
-        """
+        :param start_node_id: identifier of start node
+        :return: None
 
+        # Doctest(s):
+        >>> graph = Graph()
+        >>> graph.read_graph_from_file('graph_13/test.graph')
+        >>> graph
+        [0->1(30), 0->2(70), 1->2(20), 2->3(50), 3->1(40), 4->3(20)]
+        >>> start_id = 1
+        >>> graph.compute_shortest_paths(start_id)
+        >>> ['{0}->{1}({2})'.format(start_id, node._id, node._distance) for node in graph._nodes]
+        ['1->0(-1)', '1->1(0)', '1->2(20)', '1->3(70)', '1->4(-1)']
+        """
+        # Distance from start node to itself is 0.
+        self._nodes[start_node_id]._distance = 0
+
+        # Priority queue for shortest path storage.
+        active_nodes = queue.PriorityQueue()
+        # Put start node into priority queue as first element.
+        active_nodes.put(self._nodes[start_node_id])
+
+        while not active_nodes.empty():
+        # while active_nodes.qsize():
+            node = active_nodes.get()
+            if node._settled:
+                # Node has already been settled.
+                continue
+            # Settle active node.
+            node._settled = True
+
+            # Update all connected nodes.
+            for arc in self._adjacency_lists[node._id]:
+                new_node = self._nodes[arc.head_node_id]
+                new_distance = node._distance + arc.costs
+
+                # Update tentative distance if a new distance is smaller.
+                if not new_node._settled and (
+                        new_node._distance < 0 or
+                        new_distance < new_node._distance):
+                    new_node._distance = new_distance
+                    new_node._traceback_arc = arc
+                    active_nodes.put(new_node)
+
+        return None
 
     def __repr__(self):
         """
@@ -278,13 +321,21 @@ class Graph:
 
 class Node:
 
-    def __init__(self, node_id, latitude, longitude):
+    def __init__(self, node_id, latitude, longitude, traceback_arc=None):
         self._id = node_id
         self._latitude = latitude
         self._longitude = longitude
+        # Especially needed for Dijkstra's algorithm.
+        self._traceback_arc = traceback_arc
+        self._settled = False
+        self._distance = -1
 
     def __repr__(self):
         return '{0}'.format(self._id)
+
+    def __lt__(self, other):
+        """ Defines the operator '<' (less than) for priority queue. """
+        return self._distance < other._distance
 
 
 class Arc:
@@ -301,11 +352,100 @@ class Arc:
         return '{0}->{1}({2})'.format(self.tail_node_id, self.head_node_id,
                                       self.costs)
 
+def travel_to(graph, end_node, max_speed):
+    """ Compute distance and travel time of the selected path. """
+    node = graph._nodes[end_node]
+    # Time in hours [h].
+    time = 0
+    # Distance in kilometers [km]
+    distance = 0
+
+    while True:
+        arc = node._traceback_arc
+        if not arc:
+            break
+
+        distance += arc.distance / 1000.0
+
+        # v = s / t => t = s / v
+        time += arc.distance / 1000.0 / min(arc.max_speed, max_speed)
+
+        # Follow to previous node.
+        node = graph._nodes[arc.tail_node_id]
+
+    return (distance, time_to_string(time))
+
+def time_to_string(time):
+    """ Convert time [h] to string format. """
+    hh = int(time)
+    mm = int((time - hh) * 60)
+
+    return '{0} hour(s) and {1} minute(s)'.format(hh, mm)
+
+def reset_graph(graph):
+    """ Resets the graph and it's fields. """
+    for node in graph._nodes:
+        node._traceback_arc = None
+        node._settled = False
+        node._distance = -1
+
+def get_furthest_node(graph):
+    """ Returns the id fo the furthest node. """
+    max_dist = (-1, None)
+
+    for node in graph._nodes:
+        if node._distance > max_dist[0]:
+            max_dist = (node._distance, node._id)
+
+    return max_dist[1]
+
 
 def main():
     """ TODO
     Main function.
     """
+    print("Read in file *.graph: START!")
+    graph = Graph()
+    graph.read_graph_from_file('bawue_bayern_13/bawue_bayern.graph')
+    graph.set_arc_costs_to_distance()
+    print("Read in file *.graph: END!")
+
+    # Shortest and longest distance.
+    print("\nShortest path:")
+    graph.compute_shortest_paths(5508637)
+    result1 = travel_to(graph, 4435496, sys.maxsize)
+    print("Distance: {0:.3f} km\tTime: {1}".format(result1[0], result1[1]))
+    print("\nLongest path:")
+    max_dist_id1 = get_furthest_node(graph)
+    result1 = travel_to(graph, max_dist_id1, sys.maxsize)
+    print("Distance: {0:.3f} km\tTime: {1}".format(result1[0], result1[1]))
+
+    # Shortest and longest time of travel with up to 130 km/h.
+    print("\nShortest time of travel with max. speed up to 130 km/h:")
+    reset_graph(graph)
+    graph.set_arc_costs_to_travel_time(max_vehicle_speed=130)
+    graph.compute_shortest_paths(5508637)
+    result2 = travel_to(graph, 4435496, 130)
+    print("Distance: {0:.3f} km\tTime: {1}".format(result2[0], result2[1]))
+    print("\nLongest time of travel with max. speed up to 130 km/h:")
+    max_dist_id2 = get_furthest_node(graph)
+    result2 = travel_to(graph, max_dist_id2, 130)
+    print("Distance: {0:.3f} km\tTime: {1}".format(result2[0], result2[1]))
+
+    # Shortest and longest time of travel with up to 100 km/h.
+    print("\nShortest time of travel with max. speed up to 100 km/h:")
+    reset_graph(graph)
+    graph.set_arc_costs_to_travel_time(max_vehicle_speed=100)
+    graph.compute_shortest_paths(5508637)
+    result3 = travel_to(graph, 4435496, 100)
+    print("Distance: {0:.3f} km\tTime: {1}".format(result3[0], result3[1]))
+    print("\nLongest time of travel with max. speed up to 100 km/h")
+    max_dist_id3 = get_furthest_node(graph)
+    result3 = travel_to(graph, max_dist_id3, 100)
+    print("Distance: {0:.3f} km\tTime: {1}".format(result3[0], result3[1]))
+
+
+
     # graph = Graph()
     # graph.read_graph_from_file('graph_13/test.graph')
     # print(graph)
